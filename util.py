@@ -32,7 +32,7 @@ def dig(dic, indice_names):
     novo_indice = indice_names.copy()
     if isinstance(dic, dict):
         for key in dic.keys():
-            get_leafs(dic[key], novo_indice + [key])
+            dig(dic[key], novo_indice + [key])
         return
     total.append(novo_indice)
     return
