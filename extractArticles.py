@@ -19,14 +19,17 @@ total = range(1, 17034)
 driver = webdriver.Firefox()
 driver.get(PLOSONE + '1')
 
-articlesEditorName = []
-articlesSubject = []
-articleID = []
-id = 0
-articesurl = []
-articlesDate = []
 ano = 2019
 for i in ano2019:
+
+    articlesEditorName = []
+    articlesSubject = []
+    articleID = []
+    id = 0
+    articesurl = []
+    articlesDate = []
+    if os.path.exists('dev/articles/' + str(i) + '.csv'):
+        continue
     driver.get(PLOSONE + str(i))
     # time.sleep(0.5)
     elements = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "#subject-list-view > #search-results > li > h2 > a.list-title")))
@@ -67,10 +70,16 @@ for i in ano2019:
             articlesDate.append(date)
             articlesEditorName.append(editorName)
             articesurl.append(url)
+    parcial = pd.DataFrame()
+    parcial['nome'] = articlesEditorName
+    parcial['area'] = articlesSubject
+    parcial['url'] = articesurl
+    parcial['data'] = articlesDate
+    parcial.to_csv('dev/articles/' + str(i) + '.csv', sep = ';', encoding = 'utf-8', index = False)
+driver.close()
 df = pd.DataFrame()
-df['identificador'] = articleID
-df['area'] = articlesSubject
-df['nome'] = articlesEditorName
-df['url'] = articesurl
-df['data'] = articlesDate
-df.to_csv('dev/articles.csv', sep=';', encoding='utf-8', index=False)
+for file in os.listdir('dev/articles'):
+    df2 = pd.read_csv('dev/articles/' + file, sep = ';', encoding = 'utf-8')
+    df = pd.concat([df, df2])
+
+df.to_csv('dev/articles/allArticles.csv', sep = ';', encoding = 'utf-8', index = False)
